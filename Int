@@ -1,0 +1,142 @@
+package HW;
+import java.util.Random;
+//Code by Konstantin Martynyuk
+
+public class Interpreter{
+	static int PC;
+    static int AC;
+  
+  static Random rand = new Random();
+  static int r1 = rand.nextInt(50);
+  static int r2 = rand.nextInt(50);
+  static int r3 = rand.nextInt(50);
+  static int r4 = rand.nextInt(50);
+  static int r5 = rand.nextInt(50);
+  
+  static boolean run_bit = true;
+  static int instr;
+  static int instr_type;
+  static int data_loc;
+  static int data;
+  static int r;
+  static int register;
+  static boolean debug = true;
+
+  static final int CLR = 1000;
+  static final int ADDI = 1001;
+  static final int ADDM = 1002;
+  static final int HALT = 1111;
+  static final int LDI = 1011;
+  static final int LDM = 1021;
+  static final int ST = 1211;
+  
+
+  public static void Interpreter (int  memory[], int starting_address) {
+
+PC = starting_address;
+run_bit = true;
+	while (run_bit){
+          instr = memory[PC];
+          PC = PC + 1;
+          instr_type = get_instr_type(instr);
+          data_loc = find_data(instr, r, data, memory);
+          if (data_loc >= 0) {
+        	  data = memory[data_loc];
+     
+          }
+          execute(instr_type, r, data, memory);
+      }
+  }
+
+  private static int get_instr_type(int opcode) {
+	  	return opcode;
+  }
+
+
+  private static int find_data(int opcode, int reg, int data, int memory[]) {
+      if (opcode == ADDI) {
+          return PC;
+      }
+      if (opcode == ADDM) {
+          return memory[PC];
+      } else
+          return -1;
+  }
+  
+  private static void execute(int type, int reg, int data, int memory[]) {	 
+
+	  if (instr_type == CLR) {
+          r1 = 0;
+          r2 = 0;
+          r3 = 0;
+          r4 = 0;
+          r5 = 0;
+          System.out.println("CLEAR");
+	  }
+      if (instr_type == ADDI) {
+    	  switch (reg) {
+    	  case 1:
+    		  r1 = r1 + data;
+    		  System.out.println(reg);
+    		  break;
+    	  case 2:
+    		  r2 = r2 + data;
+    		  System.out.println(reg);
+    		  break;
+    	  case 3:
+    		  r3 = r3 + data;
+    		  System.out.println(reg);
+    		  break;
+    	  case 4:
+    		  r4 = r4 + data;
+    		  System.out.println(reg);
+    		  break;
+    	  case 5:
+    		  r5 = r5 + data;
+    		  System.out.println(reg);
+    		  break;
+    	  }
+      }
+      if (instr_type == ADDM) {
+          reg = reg + data;
+          System.out.println(reg);
+      }
+      if (instr_type == HALT) {
+          run_bit = false;
+      }
+      if (instr_type == LDI) {
+    	  type = data;
+    	  System.out.println(LDI);
+      }
+      if (instr_type == LDM) {
+		  reg = memory[data];	  
+      }
+      if (instr_type == ST) {
+    	  memory[data] = reg;
+      }
+	  if(debug) {
+		  System.out.printf("Instruction %1$d: r1=%2$d, r2=%3$d, r3=%4$d, r4=%5$d, r5=%6$d PC=%7$d, RUN=%8$B%n",
+		  		type, r1, r2, r3, r4, r5, PC, run_bit);
+	  }
+  }
+ 
+  public static void main(String[] args) {
+	  if (args.length > 0) {
+	  debug = (args[0].trim().equalsIgnoreCase("-debug")) ? true : false;
+	  }
+	  int  m2[] = { 9,
+              -5,
+               CLR,    1,  0,      
+               CLR,    1,  0,
+               ADDI,   2,  4,
+               ADDI,   19,  4,
+               ADDM,   1,  0,
+               ADDM,   3,  1,
+               ST,     1,   r3,
+               LDM,    2,  1,
+               CLR,    4,  0,
+               HALT,   0,   0
+ };
+ Interpreter( m2, 2 );
+}
+}
